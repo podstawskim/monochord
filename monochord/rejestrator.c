@@ -473,14 +473,14 @@ void insert_data_into_bin(struct write_data *writeData, struct input_data inputD
 void send_info_signal(struct write_data* writeData, struct registration_data* registrationData, struct input_data inputData) {
 
     printf("\n!!!Sending signal with information!!!\n");
-    unsigned int signal_value = 0; //informacja do przeslania
-    if(inputData.binary_file_name != NULL) signal_value |= 1UL << 0;
-    if(registrationData->source_pid) signal_value |= 1UL << 1;
-    if(registrationData->reference_time) signal_value |= 1UL << 2;
-    if(registrationData->start) signal_value |= 1UL << 3;
+    int signal_value = 0; //informacja do przeslania
+    if(registrationData->start) signal_value += 8;
+    if(registrationData->reference_time) signal_value += 4;
+    if(registrationData->source_pid) signal_value +=2;
+    if(inputData.binary_file_name != NULL) signal_value += 1;
 
-    printf("information bits: %d%d%d%d\n\n", ((signal_value>>0)&1U),((signal_value>>1)&1U),((signal_value>>2)&1U),((signal_value>>3)&1U));
-
+    printf("Data for info-rejestrator: %d\n", signal_value);
+    
     union sigval sv;
     sv.sival_int = signal_value;
     int info_signal = inputData.com_number;
