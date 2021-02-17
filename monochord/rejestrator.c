@@ -168,8 +168,11 @@ int main(int argc, char ** argv) {
 
 
 void print_arguments(struct input_data inputData, pid_t pid) {
-    printf("Signal parsing data (PID): %d\n", inputData.data_number );
-    printf("Signal parsing commands (PID): %d\n", inputData.com_number);
+
+    printf("\n--------------------REJESTRATOR--------------------\n");
+    printf("Rejestrator PID: %d\n", pid);
+    printf("Data RT signal: %d\n", inputData.data_number );
+    printf("Commands RT signal: %d\n", inputData.com_number);
     if(inputData.binary_file_name == NULL) {
         printf("Binary file wasn't specified!\n");
     } else {
@@ -179,8 +182,8 @@ void print_arguments(struct input_data inputData, pid_t pid) {
         printf("Text file (default): stdout\n");
     }
     else
-        printf("Text file: %s\n\n", inputData.text_file_name);
-    printf("Rejestrator PID: %d\n", pid);
+        printf("Text file: %s\n", inputData.text_file_name);
+    
     
 }
 
@@ -208,7 +211,6 @@ FILE* open_bin_file(char* binary_file_name) {
 
 static void sig_info_handler(int sig, siginfo_t *si, void *ucontext) {
     printf("Signal with data recieved: %d\n", sig);
-
     memcpy(&signalData, &si->si_value.sival_int, sizeof(int)); //odbieranie danych
     data_signal_pid = si->si_pid;
     data_signal_appeared = 1;
@@ -380,7 +382,7 @@ void insert_data_into_txt(struct write_data* writeData, struct input_data inputD
         }
     }
 
-    printf("inserting into text file/stdout! \n");
+    printf("\n!!!inserting into text file/stdout!!! \n");
     fprintf(txt_file, "%s %f ", writeData->time, writeData->data);
     if(writeData->source != 0) fprintf(txt_file, "%d", writeData->source);
     fprintf(txt_file, "\n\n");
@@ -396,7 +398,7 @@ void insert_data_into_bin(struct write_data *writeData, struct input_data inputD
         exit(1);
     }
 
-    printf("inserting into binary file!\n");
+    printf("\n!!!inserting data into binary file!!!\n");
     fwrite(&writeData->signal_time, sizeof(struct timespec), 1, bin_file ); //zpisuje strukture timespec
     fflush(bin_file);
     fwrite(&writeData->data, sizeof(float), 1, bin_file);
@@ -404,7 +406,7 @@ void insert_data_into_bin(struct write_data *writeData, struct input_data inputD
     fwrite(&writeData->source, sizeof(pid_t), 1, bin_file);
     fflush(bin_file);
 
-    printf("data was inserted into binary file!\n");
+    
     fclose(bin_file);
 
 }
