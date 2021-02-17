@@ -130,29 +130,5 @@ void interpretation(unsigned int signal_value) {
 
     if((info - 1) >= 0) printf("Binary format: USED\n");
     else printf("Binary format: NOT USED\n");
-    // for(int i = 0; i<=3; i++) {
-    //     switch (i)
-    //     {
-    //     case 3:
-    //         if((signal_value >> i) & 1U) printf("Registration is open!\n");
-    //         else printf("Registration is closed!\n");
-    //         break;
-    //     case 2:
-    //         if((signal_value >> i) & 1U) printf("Referencial point is used!\n");
-    //         else printf("Referencial pointf is not used!\n");
-    //         break;
-    //     case 1:
-    //         if((signal_value >> i) & 1U) printf("Source identification is used!\n");
-    //         else printf("Source identification is not being used!\n");
-    //         break;
-    //     case 0: 
-    //         if((signal_value >> i) & 1U) printf("Binary format is being used!\n");
-    //         else printf("Binary format is not being used!\n");
-    //         break;
-        
-    //     default:
-    //         printf("Switch error while interpretation!\n");
-    //         break;
-    //     }
-    // }
+    
 }

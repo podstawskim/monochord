@@ -73,7 +73,6 @@ int main(int argc, char ** argv) {
 
     char * pEnd = NULL;
     
-
     //1. odczytywanie parametrow przekazanych do programu 
     int opt_index = 0;
     
@@ -273,83 +272,7 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
             clock_gettime(CLOCK_REALTIME, &writeData->referece);
             registrationData->reference_time = 1;
         }   
-    }
-
-
-
-
-
-
-
-
-    // //zaczynamy od sprawdzenia jakie opcje zostaly przekazane
-    // char command_str [MAX_COMMAND];
-    // sprintf(command_str, "%d", commandData);
-    
-    // //przy przyjeciu nowego sygnalu sterujacego zeruje wartosci z poprzedniego chyba ze przyszedl 255 
-    
-    // if(strcmp(command_str, "255") != 0) {
-    //     registrationData->start = 0;
-    //     registrationData->source_pid = 0;
-    //     registrationData->reference_time = 0;
-    //     registrationData->global_time = 0;
-    // }
-
-    // if(command_str[0] == '0') return; //nie zostala przeslana 1 rejestracja nie moze sie zaczac
-    // else if( command_str[0] == '1') {
-    //     registrationData->start = 1; //mozna zaczac rejestracje
-    //     printf("Registration is now starting!\n");
-
-    //     //przepisuje oryginalny ciag komend do nowego
-    //     char commands[MAX_COMMAND - 1];
-    //     for(int i = 0; i < MAX_COMMAND; i++) {
-    //         commands[i] = command_str[i+1];
-    //     }
-
-    //     //sprawdzenie pozostalych opcji i wykonanie konkretnych akcji dla nich
-    //     if(strchr(commands, '0')) { //bez punkctu referencyjnego
-    //         registrationData->global_time = 1;
-    //     }
-    //     if(strchr(commands, '1')) { //nowy punkt referencyjny (start rejestracji)
-    //         clock_gettime(CLOCK_REALTIME, &writeData->referece);
-    //         registrationData->reference_time = 1;
-    //     }
-    //     if(strchr(commands, '2')) {
-    //         if(writeData->referece.tv_sec == 0 && writeData->referece.tv_nsec == 0) /* jak nie ma starego punktu to tworzony jest nowy, */
-    //               clock_gettime(CLOCK_REALTIME, &writeData->referece);                /* w przeciwnym wypadku uzywany jest stary */                                   
-    //         registrationData->reference_time = 1;      
-    //     }
-
-    //     if(strchr(commands, '4')) {
-    //         registrationData->source_pid = 1;
-    //     }
-
-    //     if(strchr(commands, '8')) {
-    //         //sprawdzanie czy jest plikiem regularnym czy nie, jesli tak to jest czyszczony
-    //         if(txt_file != stdout) { //isFileRegular(inputData.text_file_name)
-    //             //jest regularny wiec trzeba go wyczyscic czyli zamykamy, bo aktualnie jest otwarty i otwieramy od nowa
-    //             fclose(txt_file);
-    //             txt_file = open_txt_file(inputData.text_file_name);
-    //             printf("Content of %s, has been removed!\n", inputData.text_file_name);
-    //             //powinno byc wyczysczone
-    //         } else {
-    //             perror("File is not regular file!\n");
-    //         }        
-    //     }
-    // } else if (strcmp(command_str, "255") == 0) {
-    //     //odyslanie sygnalu do nadawcy 
-    //     /* 4 bity:
-    //         0 - rejestracja działa,
-    //         1 - używany jest punkt referencyjny, 
-    //         2 - używana jest identyfikacja źródeł, 
-    //         3 - używany jest format binarny. */
-
-    //         send_info_signal(writeData, registrationData, inputData);
-    // }
-
-    
-
-    
+    }    
 }
 
 void serve_data_signal(struct write_data* writeData, struct registration_data* registrationData, struct input_data inputData) {
@@ -462,15 +385,6 @@ void insert_data_into_bin(struct write_data *writeData, struct input_data inputD
     fclose(bin_file);
 
 }
-
-// int isFileRegular( char* file_name ) {
-//     struct stat statbuf;
-//     stat(file_name, &statbuf);
-//     if((statbuf.st_mode & S_IFMT) == S_IFREG)
-//         return 1;
-//     else
-//         return 0; //nie jest reg
-// }
 
 void send_info_signal(struct write_data* writeData, struct registration_data* registrationData, struct input_data inputData) {
 
