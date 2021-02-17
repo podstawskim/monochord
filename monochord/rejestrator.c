@@ -210,7 +210,7 @@ FILE* open_bin_file(char* binary_file_name) {
 }
 
 static void sig_info_handler(int sig, siginfo_t *si, void *ucontext) {
-    printf("Signal with data recieved: %d\n", sig);
+    printf("\nSignal with data recieved: %d\n", sig);
     memcpy(&signalData, &si->si_value.sival_int, sizeof(int)); //odbieranie danych
     data_signal_pid = si->si_pid;
     data_signal_appeared = 1;
@@ -219,7 +219,7 @@ static void sig_info_handler(int sig, siginfo_t *si, void *ucontext) {
 }
 
 static void com_sig_info_handler(int sig, siginfo_t* si, void *ucontext_t) {
-    printf("Signal with commands recieved: %d\n", sig);
+    printf("\nSignal with commands recieved: %d\n", sig);
     commandData = si->si_value.sival_int;
     com_signal_pid = si->si_pid;
     com_signal_appeared = 1;
@@ -234,10 +234,12 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
     //zaczynamy od sprawdzenia czy jest 0
     if(command == 0) {
         registrationData->start = 0;
+        printf("\nRegistration: CLOSED!\n");
     } else if( command == 255 ) {
         send_info_signal(writeData, registrationData, inputData);
     } else {
         int base = command - 1;
+        printf("\nRegistration: OPEN!\n");
 
         if(base == 0) registrationData->global_time = 1;
         if((base - 1) >= 0) {
