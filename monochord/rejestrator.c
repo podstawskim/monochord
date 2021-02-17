@@ -248,9 +248,9 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
         }
         
         if((base - 8) >= 0) {
-            if(text_file_name) { //isFileRegular(inputData.text_file_name)
+            if(inputData.text_file_name) { //isFileRegular(inputData.text_file_name)
                 //jest regularny wiec trzeba go wyczyscic czyli zamykamy, bo aktualnie jest otwarty i otwieramy od nowa
-                fclose(fopen(text_file_name, "w"));
+                fclose(fopen(inputData.text_file_name, "w"));
                 printf("Content of %s, has been removed!\n", inputData.text_file_name);
                 //powinno byc wyczysczone
             } else {
