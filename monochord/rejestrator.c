@@ -242,7 +242,10 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
         registrationData->start = 1;
         printf("\nRegistration: OPEN!\n");
 
-        if(base == 0) registrationData->global_time = 1;
+        if(base == 0) {
+            registrationData->global_time = 1;
+            registrationData->reference_time = 0;
+        }
         
         if((base - 8) >= 0) {
             if(txt_file != stdout) { //isFileRegular(inputData.text_file_name)
