@@ -239,25 +239,11 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
         send_info_signal(writeData, registrationData, inputData);
     } else {
         int base = command - 1;
+        registrationData->start = 1;
         printf("\nRegistration: OPEN!\n");
 
         if(base == 0) registrationData->global_time = 1;
-        if((base - 1) >= 0) {
-            clock_gettime(CLOCK_REALTIME, &writeData->referece);
-            registrationData->reference_time = 1;
-        }
-        if((base - 2) >= 0) {
-            if(writeData->referece.tv_sec == 0 && writeData->referece.tv_nsec == 0) /* jak nie ma starego punktu to tworzony jest nowy, */
-                  clock_gettime(CLOCK_REALTIME, &writeData->referece);                /* w przeciwnym wypadku uzywany jest stary */                                   
-            registrationData->reference_time = 1;
-            base -= 2;
-        }
-
-        if((base - 4 ) >= 0) {
-            registrationData->source_pid = 1;
-            base -= 4;
-        }
-
+        
         if((base - 8) >= 0) {
             if(txt_file != stdout) { //isFileRegular(inputData.text_file_name)
                 //jest regularny wiec trzeba go wyczyscic czyli zamykamy, bo aktualnie jest otwarty i otwieramy od nowa
@@ -271,6 +257,20 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
             base -=8;
 
         }
+        if((base - 4 ) >= 0) {
+            registrationData->source_pid = 1;
+            base -= 4;
+        }
+        if((base - 2) >= 0) {
+            if(writeData->referece.tv_sec == 0 && writeData->referece.tv_nsec == 0) /* jak nie ma starego punktu to tworzony jest nowy, */
+                  clock_gettime(CLOCK_REALTIME, &writeData->referece);                /* w przeciwnym wypadku uzywany jest stary */                                   
+            registrationData->reference_time = 1;
+            base -= 2;
+        }
+        if((base - 1) >= 0) {
+            clock_gettime(CLOCK_REALTIME, &writeData->referece);
+            registrationData->reference_time = 1;
+        }   
     }
 
 
