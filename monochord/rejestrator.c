@@ -34,7 +34,8 @@ struct input_data {
 
 struct write_data {
     struct timespec signal_time;
-    struct timespec referece;
+    struct timespec* reference[100];
+    int currentReference;
     char time[25];
     float data;
     pid_t source;
@@ -68,6 +69,11 @@ void insert_data_into_bin(struct write_data*, struct input_data);
 int isFileRegular( char* );
 void send_info_signal(struct write_data*, struct registration_data*, struct input_data);
 int modify_bit(int, int, int);
+void set_new_reference();
+void restore_last_reference();
+void format_reference_clock();
+long get_elapsed_ms(struct timespec, struct timespec);
+void ms_to_hours_min_sec(long);
 
 int main(int argc, char ** argv) {
 
@@ -82,6 +88,7 @@ int main(int argc, char ** argv) {
     inputData.text_file_name = NULL;
     inputData.data_number = 0;
     inputData.com_number = 0;
+    writeData.currentReference = -1;
     
     //czytanie parametrow
     while((opt_index = getopt(argc, argv, "b:t:d:c:")) != -1 ) {
@@ -263,14 +270,17 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
             base -= 4;
         }
         if((base - 2) >= 0) {
-            if(writeData->referece.tv_sec == 0 && writeData->referece.tv_nsec == 0) /* jak nie ma starego punktu to tworzony jest nowy, */
-                  clock_gettime(CLOCK_REALTIME, &writeData->referece);                /* w przeciwnym wypadku uzywany jest stary */                                   
-            registrationData->reference_time = 1;
+            // if(writeData->reference.tv_sec == 0 && writeData->reference.tv_nsec == 0) /* jak nie ma starego punktu to tworzony jest nowy, */
+            //       clock_gettime(CLOCK_REALTIME, &writeData->reference);                /* w przeciwnym wypadku uzywany jest stary */                                   
+            // registrationData->reference_time = 1;
+            restore_last_reference();
             base -= 2;
         }
         if((base - 1) >= 0) {
-            clock_gettime(CLOCK_REALTIME, &writeData->referece);
+
+            // clock_gettime(CLOCK_REALTIME, &writeData->reference);
             registrationData->reference_time = 1;
+            set_new_referenece();
         }   
     }    
 }
@@ -298,17 +308,8 @@ void serve_data_signal(struct write_data* writeData, struct registration_data* r
             exit(1);
         }
         
-    } else {
-        //obliczanie czasu referencyjnego
-        writeData->signal_time = calculate_time(writeData);
-        //zapisywanie w innym formacie niz w przypadku czasu bez punktu referencyjnego
-        float mili_secs = writeData->signal_time.tv_nsec/1000000;
-        struct tm now;
-        localtime_r(&writeData->signal_time.tv_sec, &now);
-        if(sprintf(writeData->time, "%02d:%02d:%02d.%.0f ", now.tm_hour, now.tm_min, now.tm_sec, mili_secs) < 0) {
-            perror("sprintf time error!\n");
-            exit(1);
-        }
+    } else { 
+        format_reference_clock();
     }
     
 
@@ -329,20 +330,20 @@ void serve_data_signal(struct write_data* writeData, struct registration_data* r
     }
 }
 
-struct timespec calculate_time(struct write_data* writeData) {
-    struct timespec deltaTime = {0};
-    struct timespec currentTime = {0};
-    clock_gettime(CLOCK_MONOTONIC, &currentTime);
-    deltaTime.tv_sec = currentTime.tv_sec - writeData->referece.tv_sec;
-    deltaTime.tv_nsec = currentTime.tv_sec - writeData->referece.tv_nsec;
+// struct timespec calculate_time(struct write_data* writeData) {
+//     struct timespec deltaTime = {0};
+//     struct timespec currentTime = {0};
+//     clock_gettime(CLOCK_MONOTONIC, &currentTime);
+//     deltaTime.tv_sec = currentTime.tv_sec - writeData->reference.tv_sec;
+//     deltaTime.tv_nsec = currentTime.tv_sec - writeData->reference.tv_nsec;
 
-    if(deltaTime.tv_nsec < 0) {
-        deltaTime.tv_sec -= 1;
-        deltaTime.tv_nsec = 1000000000 + deltaTime.tv_nsec;
-    }
+//     if(deltaTime.tv_nsec < 0) {
+//         deltaTime.tv_sec -= 1;
+//         deltaTime.tv_nsec = 1000000000 + deltaTime.tv_nsec;
+//     }
 
-    return deltaTime;
-}
+//     return deltaTime;
+// }
 
 
 void insert_data_into_txt(struct write_data* writeData, struct input_data inputData) {
@@ -412,4 +413,55 @@ void send_info_signal(struct write_data* writeData, struct registration_data* re
 int modify_bit(int value, int position, int b) {
     int mask = 1 << position;
     return (value & ~mask) | ((b << position) & mask);
+}
+
+void set_new_reference() {
+    writeData.currentReference++;
+
+    struct timespec* new_reference = malloc(sizeof(struct timespec));
+    clock_gettime(CLOCK_MONOTONIC, new_reference);
+    writeData.reference[writeData.currentReference] = new_reference;
+}
+
+struct timespec * get_current_reference() {
+    if(writeData.currentReference >= 0) return writeData.reference[writeData.currentReference];
+    else {
+        printf("Reference time is not yet set!\n");
+        return NULL;
+    }
+}
+
+void restore_last_reference() {
+    if(writeData.currentReference >= 0) {
+        writeData.currentReference--;
+    }
+}
+
+void format_reference_clock() {
+    struct timespec now_time;
+    clock_gettime(CLOCK_MONOTONIC, &now_time);
+    struct timespec *reference_pointer = get_current_reference();
+
+    if(reference_pointer != NULL) {
+        long elapsed_ms = get_elapsed_ms(now_time, *reference_pointer);
+        ms_to_hours_min_sec(elapsed_ms);
+    }
+}
+
+long get_elapsed_ms(struct timespec after, struct timespec before) {
+    return ((after.tv_sec - before.tv_sec) * 1000000000 + (after.tv_nsec - before.tv_nsec))/1000000;
+
+} 
+
+void ms_to_hours_min_sec(long ms) {
+    long mili = ms;
+
+    int hr = mili / 3600000;
+    mili = mili - 3600000 * hr;
+    int min = mili / 60000;
+    mili = mili - 60000 * min;
+    int sec = mili / 1000;
+    mili = mili - 1000 * sec;
+
+    sprintf(writeData.time, "%d:%d:%d.%ld", hr, min, sec, mili);
 }
