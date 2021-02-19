@@ -63,7 +63,7 @@ static void com_sig_info_handler (int, siginfo_t*, void*);
 
 void serve_command_signal(struct write_data*, struct registration_data*, struct input_data);
 void serve_data_signal(struct write_data*, struct registration_data*, struct input_data);
-struct timespec calculate_time(struct write_data*);
+// struct timespec calculate_time(struct write_data*);
 void insert_data_into_txt(struct write_data*, struct input_data);
 void insert_data_into_bin(struct write_data*, struct input_data);
 int isFileRegular( char* );
