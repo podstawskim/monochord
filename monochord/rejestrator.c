@@ -283,7 +283,7 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
             // clock_gettime(CLOCK_REALTIME, &writeData->reference);
             registrationData->reference_time = 1;
             registrationData->global_time = 0;
-            set_new_referenece();
+            set_new_reference();
         }   
     }    
 }
