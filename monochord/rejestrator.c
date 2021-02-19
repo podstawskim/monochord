@@ -272,14 +272,17 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
         if((base - 2) >= 0) {
             // if(writeData->reference.tv_sec == 0 && writeData->reference.tv_nsec == 0) /* jak nie ma starego punktu to tworzony jest nowy, */
             //       clock_gettime(CLOCK_REALTIME, &writeData->reference);                /* w przeciwnym wypadku uzywany jest stary */                                   
-            // registrationData->reference_time = 1;
+            registrationData->reference_time = 1;
+            registrationData->global_time = 0;
             restore_last_reference();
             base -= 2;
+
         }
         if((base - 1) >= 0) {
 
             // clock_gettime(CLOCK_REALTIME, &writeData->reference);
             registrationData->reference_time = 1;
+            registrationData->global_time = 0;
             set_new_referenece();
         }   
     }    
