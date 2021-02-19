@@ -274,6 +274,7 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
             //       clock_gettime(CLOCK_REALTIME, &writeData->reference);                /* w przeciwnym wypadku uzywany jest stary */                                   
             registrationData->reference_time = 1;
             registrationData->global_time = 0;
+            printf("Restoring last reference time!\n");
             restore_last_reference();
             base -= 2;
 
@@ -283,6 +284,7 @@ void serve_command_signal(struct write_data* writeData, struct registration_data
             // clock_gettime(CLOCK_REALTIME, &writeData->reference);
             registrationData->reference_time = 1;
             registrationData->global_time = 0;
+            printf("Setting new reference time!");
             set_new_reference();
         }   
     }    
@@ -437,6 +439,8 @@ struct timespec * get_current_reference() {
 void restore_last_reference() {
     if(writeData.currentReference >= 0) {
         writeData.currentReference--;
+    } else {
+        set_new_reference();
     }
 }
 
